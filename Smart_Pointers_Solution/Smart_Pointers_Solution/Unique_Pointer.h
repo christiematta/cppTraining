@@ -7,14 +7,22 @@ template<typename T>
 class MyUniquePointer
 {
 public:
-	MyUniquePointer(T& t)
+
+
+	MyUniquePointer( T * t)
+		: m_pointer(t)
 	{
-		m_pointer = new T(t);
+	}
+
+	MyUniquePointer()
+		:m_pointer(nullptr)
+	{
+		
 	}
 
 	~MyUniquePointer()
 	{
-		delete m_pointer;
+		reset();
 	}
 
 	MyUniquePointer<T>& operator=(MyUniquePointer<T>&& ptr);
@@ -25,13 +33,11 @@ public:
 
 	T& operator*() const;
 
-	bool operator!() const;
-
 	T* get() const;
 
 	void reset();
 
-	T & release();
+	T * release();
 	
 	operator bool() const;
 
@@ -44,14 +50,14 @@ private:
 template<typename T>
 MyUniquePointer<T> make_unique(T & obj)
 {
-	return MyUniquePointer<T>(obj);
+	return MyUniquePointer<T>(new T(obj));
 }
 
 
 template<typename T, class... Args>
 MyUniquePointer<T> make_unique(Args&& ... args)
 {
-	return MyUniquePointer<T>(T(std::forward<Args>(args) ...));
+	return MyUniquePointer<T>(new T(std::forward<Args>(args) ...));
 }
 
 template<typename T>
@@ -78,11 +84,7 @@ inline T& MyUniquePointer<T>::operator*() const
 {
 	return *m_pointer;
 }
-template<typename T>
-inline bool MyUniquePointer<T>::operator!() const
-{
-	return(m_pointer == nullptr);
-}
+
 
 template<typename T>
 inline T* MyUniquePointer<T>::get() const
@@ -93,21 +95,22 @@ inline T* MyUniquePointer<T>::get() const
 template<typename T>
 inline void MyUniquePointer<T>::reset()
 {
+	delete m_pointer;
 	m_pointer = nullptr;
 }
 
 template<typename T>
-inline T & MyUniquePointer<T>::release()
+inline T * MyUniquePointer<T>::release()
 {	
-	T& res = *m_pointer;
-	reset();
+	T * res = m_pointer;
+	m_pointer = nullptr;
 	return res;
 }
 
 template<typename T>
 inline MyUniquePointer<T>::operator bool() const
 {
-	return(!(!(*this)));
+	return(m_pointer!=nullptr);
 }
 
 
