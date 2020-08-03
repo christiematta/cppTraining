@@ -42,9 +42,16 @@ private:
 };
 
 template<typename T>
-MyUniquePointer<T> move(MyUniquePointer<T>& ptr)
+MyUniquePointer<T> make_unique(T & obj)
 {
-	return ptr.move();
+	return MyUniquePointer<T>(obj);
+}
+
+
+template<typename T, class... Args>
+MyUniquePointer<T> make_unique(Args&& ... args)
+{
+	return MyUniquePointer<T>(T(std::forward<Args>(args) ...));
 }
 
 template<typename T>
@@ -102,6 +109,45 @@ inline MyUniquePointer<T>::operator bool() const
 {
 	return(!(!(*this)));
 }
+
+
+class Parent
+{
+public:
+	explicit Parent(int x)
+		: m_x(x)
+	{}
+private:
+	int m_x;
+};
+
+
+
+class Child1 : public Parent
+{
+public:
+	Child1()
+		: Parent(0)
+		, m_s("Default")
+	{}
+
+	Child1(const std::string& s)
+		: Parent(0)
+		, m_s(s)
+	{}
+
+	Child1(int x, const std::string& s)
+		: Parent(x)
+		, m_s(s)
+	{}
+
+
+
+private:
+	std::string m_s;
+};
+
+
 
 }
 #endif

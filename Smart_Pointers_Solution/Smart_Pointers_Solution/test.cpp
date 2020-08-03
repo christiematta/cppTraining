@@ -4,6 +4,20 @@
 
 using namespace smartpointers;
 
+
+TEST(pointers, makeUniqueWorksWithExample) {
+	MyUniquePointer<Child1> child1Default = make_unique<Child1>();
+	MyUniquePointer<Child1> child1With2Params = make_unique<Child1>(27, "Christie");
+
+	MyUniquePointer<Child1> child1With1Params = make_unique<Child1>("Ryan");
+
+}
+
+TEST(pointers, makeUniqueWorks) {
+	std::vector<int> vec = { 1,45,6,7 };
+	MyUniquePointer<std::vector<int>> ptr = make_unique(vec);
+}
+
 TEST(pointers, releaseWorks) {
 	std::vector<int> vec = { 1,45,6,7 };
 	MyUniquePointer<std::vector<int>> ptr(vec);
